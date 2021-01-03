@@ -1,5 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
+const cors = require('cors');
 const app = express();
 const port = 3001;
 
@@ -8,6 +9,8 @@ morgan.token('body', (req, res) => JSON.stringify(req.body));
 app.use(morgan(':method :url :status :response-time ms - :res[content-length] :body'));
 app.use(express.json()); // for parsing application/json
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
+app.use(express.static('build'))
 
 let data = [
     {
@@ -92,6 +95,8 @@ app.get('/info', (req, res) => {
     res.send('Phonebook has info for ' + data.length + ' people <br /><br />' + new Date());
 })
 
+const PORT = process.env.PORT || 3001
+
 app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}.`)
+    console.log(`Example app listening at http://localhost:${PORT}.`)
 })
