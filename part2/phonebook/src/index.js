@@ -42,7 +42,7 @@ const PersonForm = ({ newName, newPhone, handleChangeName, handleChangePhone, ha
 
 const Notification = ({ message }) => {
   return (
-    <p className="error-message">{message}</p>
+    <p className={`error-message-${message.color}`}>{message.message}</p>
   );
 }
 
@@ -53,7 +53,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newPhone, setNewPhone] = useState('')
   const [newPhoneSearch, setNewPhoneSearch] = useState('')
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState({});
 
   useEffect(async () => {
     const data = await getAll();
@@ -62,7 +62,10 @@ const App = () => {
   }, []);
 
   const deletePersonHandler = async (person) => {
-    deletePerson(person.id);
+    const deleted = await deletePerson(person.id);
+    if (!deleted) {
+      setErrorMessage({ message: 'Information of ' + person.name + 'has already been removed from server', color: 'red' });
+    }
     const data = await getAll();
     setPersons(data.data);
   }
@@ -94,7 +97,7 @@ const App = () => {
         name: newName,
         phone: newPhone,
       });
-      setErrorMessage('Updated ' + newName);
+      setErrorMessage({ message: 'Updated ' + newName, color: 'green' });
     }
 
     if (!findPerson.length) {
@@ -102,7 +105,7 @@ const App = () => {
         name: newName,
         phone: newPhone,
       });
-      setErrorMessage('Added ' + newName);
+      setErrorMessage({ message: 'Added ' + newName, color: 'green' });
     }
 
     const data = await getAll();

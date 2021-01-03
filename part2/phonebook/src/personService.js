@@ -11,7 +11,17 @@ export const create = async (newObject) => {
 }
 
 export const deletePerson = async (id) => {
-    await axios.delete(`${baseUrl}/${id}`);
+    try {
+        await axios.delete(`${baseUrl}/${id}`).catch(err => {
+            if (err.response.status === 404) {
+                throw new Error(`${err.config.url} not found`);
+            }
+            throw err;
+        });;
+        return true;
+    } catch (e) {
+        return false;
+    }
 }
 
 export const updatePerson = async (person) => {
