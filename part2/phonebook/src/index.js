@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom';
-import axios from 'axios';
+import { create, getAll, deletePerson, updatePerson } from './personService.js';
+import './index.css';
 
 const Filter = ({ value, onChange }) => {
   return (
@@ -10,12 +11,13 @@ const Filter = ({ value, onChange }) => {
   );
 }
 
-const Persons = ({ persons, newPhoneSearch }) => {
+const Persons = ({ persons, newPhoneSearch, deletePersonHandler }) => {
+
   return (
     <div>
       {persons.map((person) => {
         if (person.name.indexOf(newPhoneSearch) > -1) {
-          return <p>{person.name} {person.phone}</p>;
+          return <p>{person.name} {person.phone} <button type="button" onClick={() => deletePersonHandler(person)}>delete</button></p>;
         } else {
           return null;
         }
@@ -38,6 +40,12 @@ const PersonForm = ({ newName, newPhone, handleChangeName, handleChangePhone, ha
   );
 }
 
+const Notification = ({ message }) => {
+  return (
+    <p className="error-message">{message}</p>
+  );
+}
+
 const App = () => {
   const [persons, setPersons] = useState([
     { name: 'Arto Hellas' }
@@ -45,12 +53,19 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newPhone, setNewPhone] = useState('')
   const [newPhoneSearch, setNewPhoneSearch] = useState('')
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(async () => {
-    const data = await axios.get('http://localhost:3001/persons');
+    const data = await getAll();
     console.log(data.data);
     setPersons(data.data);
   }, []);
+
+  const deletePersonHandler = async (person) => {
+    deletePerson(person.id);
+    const data = await getAll();
+    setPersons(data.data);
+  }
 
   const handleChangeName = (event) => {
     setNewName(event.target.value)
@@ -60,19 +75,38 @@ const App = () => {
     setNewPhone(event.target.value)
   }
 
-  const handleAdd = () => {
+  const addPerson = async (data) => {
+    await create(data);
+  }
+
+  const handleAdd = async () => {
     const findPerson = persons.filter((person) => person.name === newName);
-    console.log(findPerson);
+    let isConfirmed = false;
     if (!!findPerson.length) {
-      alert(`${newName} is already added to phonebook`);
-    } else {
-      setPersons([
-        ...persons,
-        {
-          name: newName,
-          phone: newPhone,
-        }])
+      console.log(persons, findPerson);
+      // eslint-disable-next-line no-restricted-globals
+      isConfirmed = confirm(`${newName} is already added to phonebook, replace the old number with a new one ^_^`);
     }
+
+    if (isConfirmed) {
+      await updatePerson({
+        id: findPerson[0].id,
+        name: newName,
+        phone: newPhone,
+      });
+      setErrorMessage('Updated ' + newName);
+    }
+
+    if (!findPerson.length) {
+      await create({
+        name: newName,
+        phone: newPhone,
+      });
+      setErrorMessage('Added ' + newName);
+    }
+
+    const data = await getAll();
+    setPersons(data.data);
   }
 
   const handleChangePhoneSearch = (event) => {
@@ -82,11 +116,12 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      {!!errorMessage && <Notification message={errorMessage} />}
       <Filter value={newPhoneSearch} onChange={handleChangePhoneSearch} />
       <h2>add a new</h2>
       <PersonForm newName={newName} handleChangeName={handleChangeName} handleChangePhone={handleChangePhone} handleAdd={handleAdd} />
       <h2>Numbers</h2>
-      <Persons persons={persons} newPhoneSearch={newPhoneSearch} />
+      <Persons persons={persons} newPhoneSearch={newPhoneSearch} deletePersonHandler={deletePersonHandler} />
     </div>
   )
 }
