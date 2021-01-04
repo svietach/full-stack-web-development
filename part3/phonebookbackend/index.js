@@ -51,7 +51,7 @@ app.put('/api/persons/:id', (req, res) => {
     });
 });
 
-app.post('/api/persons', async (req, res) => {
+app.post('/api/persons', async (req, res, next) => {
     const { name, number } = req.body;
     let error;
 
@@ -70,7 +70,7 @@ app.post('/api/persons', async (req, res) => {
 
             person.save().then(result => {
                 res.sendStatus(201);
-            })
+            }).catch(error => next(error))
         }
     }
 
@@ -127,6 +127,8 @@ const errorHandler = (error, request, response, next) => {
 
     if (error.name === 'CastError') {
         return response.status(400).send({ error: 'malformatted id' });
+    } else if (error.name === 'ValidationError') {
+        return response.status(400).json({ error: error.message })
     }
 
     next(error);
