@@ -1,30 +1,41 @@
 const blogsRouter = require('express').Router();
 const Blog = require('./../models/blogs');
+const User = require('./../models/users');
+const config = require('./../utils/config')
+const jwt = require('jsonwebtoken');
 
-blogsRouter.get('/api/blogs', (request, response) => {
-    Blog
+blogsRouter.get('/', async (request, response) => {
+    const blogs = await Blog
         .find({})
-        .then(blogs => {
-            response.json(blogs)
-        })
+        .populate('user');
+    response.json(blogs);
 })
 
-blogsRouter.delete('/api/blogs/:id', async (request, response) => {
-    const findBlog = await Blog.findById(request.params.id);
-    if (!!findBlog) {
-        Blog.findByIdAndRemove(request.params.id, (err, result) => {
-            if (err) {
-                response.status(500).json({ error: 'Delete failed!' });
-            } else {
-                response.status(200).json({ message: 'Blog deleted!' });
-            }
-        });
+blogsRouter.delete('/:id', async (request, response) => {
+    const decodedToken = jwt.verify(request.token, config.SECRET)
+    if (!request.token || !decodedToken.id) {
+        return response.status(401).json({ error: 'token missing or invalid' })
+    }
+    const findBlog = await Blog.findById(request.params.id).populate('user');
+    if (!!findBlog && findBlog.user && findBlog.user._id) {
+        if (findBlog.user._id == decodedToken.id) {
+            Blog.findByIdAndRemove(request.params.id, (err, result) => {
+                if (err) {
+                    response.status(500).json({ error: 'Delete failed!' });
+                } else {
+                    response.status(200).json({ message: 'Blog deleted!' });
+                }
+            });
+        } else {
+            console.log('findBlog.user._id', typeof findBlog.user._id, 'decodedToken.id', typeof decodedToken.id);
+            response.status(403).json({ error: 'You shall not pass!' });
+        }
     } else {
-        response.status(404).json({ error: 'Blog doesn\'t exist!' });;
+        response.status(404).json({ error: 'Blog doesn\'t exist!' });
     }
 })
 
-blogsRouter.put('/api/blogs/:id', (request, response) => {
+blogsRouter.put('/:id', (request, response) => {
     const { author, title, url, likes } = request.body;
     Blog.findByIdAndUpdate(request.params.id, { author, title, url, likes }, (err, docs) => {
         if (err) {
@@ -35,16 +46,28 @@ blogsRouter.put('/api/blogs/:id', (request, response) => {
     });
 })
 
-blogsRouter.post('/api/blogs', (request, response) => {
-    const { title, url } = request.body;
+blogsRouter.post('/', async (request, response) => {
+    const { title, url, userId, likes } = request.body;
     if (!title && !url) {
         response.status(400).json({ error: 'title & url are missing' });
     } else {
-        const blog = new Blog(request.body)
+        const decodedToken = jwt.verify(request.token, config.SECRET)
+        if (!request.token || !decodedToken.id) {
+            return response.status(401).json({ error: 'token missing or invalid' })
+        }
+        const user = await User.findById(decodedToken.id);
 
+        const blog = new Blog({
+            title,
+            url,
+            user: user._id,
+            likes
+        })
         blog
             .save()
-            .then(result => {
+            .then(async result => {
+                user.blogs = user.blogs.concat(result._id)
+                await user.save();
                 response.status(201).json(result)
             })
     }
