@@ -1,0 +1,27 @@
+.message-green {
+  color: green;
+  background: lightgrey;
+  font-size: 20px;
+  border-style: solid;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.message-red {
+  color: red;
+  background: lightgrey;
+  font-size: 20px;
+  border-style: solid;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.blog-section {
+  padding-top: 10px;
+  padding-left: 2px;
+  border: solid black;
+  border-width: 1px;
+  margin-bottom: 5px;
+}
