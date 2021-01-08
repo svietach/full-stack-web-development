@@ -37,12 +37,12 @@ const Blog = ({ blog, setBlogs, user }) => {
 
     return (
         <div className="blog-section">
-            {blog.title} {blog.author} <button type="button" onClick={onViewClickHandler}>view</button><br />
+            <div data-testid="title">{blog.title}</div> <div data-testid="author" className="my-best-classname-in-da-world">{blog.author}</div> <button type="button" data-testid="button-view" onClick={onViewClickHandler}>view</button><br />
             {isBlogShown && (
                 <>
-                    {blog.url} <br />
-                    likes {blog.likes} <button type="button" onClick={onLikeClickHandler}>like</button><br />
-                    {user.username == blog?.user?.username && <button type="button" onClick={onDeleteClickHandler}>remove</button>}
+                    <div data-testid="url">{blog.url}</div> <br />
+                    <div data-testid="likes">likes {blog.likes}</div> <button type="button" data-testid="button-like" onClick={onLikeClickHandler}>like</button><br />
+                    {user.username == blog?.user?.username && <button type="button" data-testid="button-remove" onClick={onDeleteClickHandler}>remove</button>}
                 </>
             )}
         </div>

@@ -24,13 +24,13 @@ const CreateBlogForm = ({ submitBlog }) => {
     return (
         <form>
             <h1>create new blog</h1>
-            <label for="title">title</label>
-            <input type="text" id="title" onChange={onTitleInputHandler}></input><br />
-            <label for="author">author</label>
-            <input type="text" id="author" onChange={onAuthorInputHandler}></input><br />
-            <label for="url">url</label>
-            <input type="text" id="url" onChange={onUrlInputHandler}></input><br />
-            <button type="button" onClick={onSubmitBlogClickHandler}>Create</button><br />
+            <label htmlFor="title">title</label>
+            <input data-testid="input-title" type="text" id="title" onChange={onTitleInputHandler}></input><br />
+            <label htmlFor="author">author</label>
+            <input data-testid="input-author" type="text" id="author" onChange={onAuthorInputHandler}></input><br />
+            <label htmlFor="url">url</label>
+            <input data-testid="input-url" type="text" id="url" onChange={onUrlInputHandler}></input><br />
+            <button data-testid="button-create-blog" type="button" onClick={onSubmitBlogClickHandler}>Create</button><br />
         </form>
     )
 }
