@@ -17,13 +17,13 @@ const LoginForm = ({ submitLogin }) => {
     }
 
     return (
-        <form>
+        <form data-testid="login-form">
             <h1>Log in to application</h1>
-            <label for="username">Username</label>
-            <input type="text" id="username" onChange={onUsernameInputHandler}></input><br />
-            <label for="password">password</label>
-            <input type="password" id="password" onChange={onPasswordInputHandler}></input><br />
-            <button type="button" onClick={onLoginClickHandler}>Login</button>
+            <label htmlFor="username">Username</label>
+            <input data-testid="input-username" type="text" id="username" onChange={onUsernameInputHandler}></input><br />
+            <label htmlFor="password">password</label>
+            <input data-testid="input-password" type="password" id="password" onChange={onPasswordInputHandler}></input><br />
+            <button data-testid="login-button" type="button" onClick={onLoginClickHandler}>Login</button>
         </form>
     )
 }

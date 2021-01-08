@@ -51,13 +51,13 @@ const App = () => {
   return (
     <div>
       {!!Object.keys(message).length ? (
-        <p className={`message-${message.color}`}>{message.text}</p>
+        <p data-testid="message" className={`message-${message.color}`}>{message.text}</p>
       ) : null}
       {!!Object.keys(user).length ? (<>
-        <h2>blogs</h2>
-        <p>{user.name} logged in <button type="button" onClick={onLogoutClick}>logout</button></p><br />
+        <h2 data-testid="title-blogs">blogs</h2>
+        <p>{user.name} logged in <button data-testid="logout-button" type="button" onClick={onLogoutClick}>logout</button></p><br />
         {isCreateBlogShown && <CreateBlogForm submitBlog={onSubmitBlog} />}
-        <button type="button" onClick={() => {
+        <button data-testid="show-blog-creation-button" type="button" onClick={() => {
           setIsCreateBlogShow(prevState => !prevState);
         }}>{isCreateBlogShown ? 'cancel' : 'create new blog'}</button>
         {blogs.map(blog =>

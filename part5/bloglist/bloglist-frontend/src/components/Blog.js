@@ -36,7 +36,7 @@ const Blog = ({ blog, setBlogs, user }) => {
     }
 
     return (
-        <div className="blog-section">
+        <div className="blog-section" data-testid={`blog-${blog.title}`}>
             <div data-testid="title">{blog.title}</div> <div data-testid="author" className="my-best-classname-in-da-world">{blog.author}</div> <button type="button" data-testid="button-view" onClick={onViewClickHandler}>view</button><br />
             {isBlogShown && (
                 <>
